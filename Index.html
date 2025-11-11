@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delta County GIS App</title>
+
+    <!-- ArcGIS API for JavaScript CSS -->
+    <link rel="stylesheet" href="https://js.arcgis.com/4.25/esri/themes/light/main.css">
+    <style>
+        html, body, #viewDiv { height: 100%; width: 100%; margin: 0; padding: 0; }
+        body { display: flex; flex-direction: column; min-height: 100vh; }
+        header, footer { background: #f2f2f2; padding: 0.5rem 1rem; }
+        main { flex: 1 1 auto; }
+        #map-container { height: calc(100vh - 120px); }
+        #viewDiv { height: 100%; }
+        .field-collection-btn { position: absolute; top: 80px; right: 16px; z-index: 99; background: #fff; padding: 8px 12px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.2); text-decoration: none; color: #333; }
+    </style>
+
+    <!-- ArcGIS API for JavaScript -->
+    <script src="https://js.arcgis.com/4.25/"></script>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Delta County GIS Application</h1>
+            <p>Interactive map of Delta County, Michigan</p>
+        </div>
+    </header>
+    
+    <main>
+        <div id="map-container">
+            <!-- viewDiv is required by the ArcGIS API for JavaScript MapView -->
+            <div id="viewDiv"></div>
+        </div>
+        
+        <!-- Field Collection Button -->
+        <a href="https://fieldmaps.arcgis.app/?itemID=4276a0e0d3c945bb821df31742b254de&referenceContext=open&portalURL=https%3A%2F%2Fuw-mad.maps.arcgis.com" 
+           target="_blank"
+           class="field-collection-btn" 
+           title="Open Field Collection App">
+            📱 Field Collection
+        </a>
+
+        <script>
+            const API_KEY = "https://uw-mad.maps.arcgis.com/home/item.html?id=e2b02eea049b4dc2baef562e2f3a9c18"; // <-- paste the actual API key string here
+
+            require(["esri/config", "esri/WebMap", "esri/views/MapView"], function(esriConfig, WebMap, MapView) {
+                // set api key
+                esriConfig.apiKey = API_KEY;
+
+                // create a WebMap from the portal item id
+                const webmap = new WebMap({
+                    portalItem: {
+                        id: "c5880af6f14a46559f7af8ea4100c2d7" // the map to load
+                    }
+                });
+
+                const view = new MapView({
+                    container: "viewDiv",
+                    map: webmap
+                });
+
+                view.when(() => {
+                    console.log('WebMap loaded:', webmap.portalItem.title);
+                }, function(error){
+                    console.error('View or WebMap failed to load:', error);
+                });
+            });
+
+            // Ensure the button opens in a new tab if JS is enabled
+            const fcBtn = document.querySelector('.field-collection-btn');
+            if (fcBtn) fcBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+                window.open(this.href, '_blank');
+            });
+        </script>
+    </main>
+    
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 Delta County GIS Application | Data from Delta County, Michigan</p>
+        </div>
+    </footer>
+    
+</body>
+</html>
