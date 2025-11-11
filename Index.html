@@ -7,15 +7,7 @@
 
     <!-- ArcGIS API for JavaScript CSS -->
     <link rel="stylesheet" href="https://js.arcgis.com/4.25/esri/themes/light/main.css">
-    <style>
-        html, body, #viewDiv { height: 100%; width: 100%; margin: 0; padding: 0; }
-        body { display: flex; flex-direction: column; min-height: 100vh; }
-        header, footer { background: #f2f2f2; padding: 0.5rem 1rem; }
-        main { flex: 1 1 auto; }
-        #map-container { height: calc(100vh - 120px); }
-        #viewDiv { height: 100%; }
-        .field-collection-btn { position: absolute; top: 80px; right: 16px; z-index: 99; background: #fff; padding: 8px 12px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.2); text-decoration: none; color: #333; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 
     <!-- ArcGIS API for JavaScript -->
     <script src="https://js.arcgis.com/4.25/"></script>
@@ -43,16 +35,16 @@
         </a>
 
         <script>
-            const API_KEY = "https://uw-mad.maps.arcgis.com/home/item.html?id=e2b02eea049b4dc2baef562e2f3a9c18"; // <-- paste the actual API key string here
-
             require(["esri/config", "esri/WebMap", "esri/views/MapView"], function(esriConfig, WebMap, MapView) {
                 // set api key
-                esriConfig.apiKey = API_KEY;
+                esriConfig.apiKey = "AAPKd744f2fda2e347d9a3cf7faf3473cfaczN_o6-pVEC0xDG9THThI-plcBTYdOZQwfAaWLFCk-7w8cNq-B8MvENgmb2NpNTXc";
+                // set portal URL since it's not the default ArcGIS Online
+                esriConfig.portalUrl = "https://uw-mad.maps.arcgis.com";
 
                 // create a WebMap from the portal item id
                 const webmap = new WebMap({
                     portalItem: {
-                        id: "c5880af6f14a46559f7af8ea4100c2d7" // the map to load
+                        id: "18855e2cb43a4c7aa6212f1692b35d7d" // the map to load
                     }
                 });
 
