@@ -34,6 +34,7 @@
                 <option value="Gladstone">Gladstone</option>
                 <option value="Ford River">Ford River</option>
                 <option value="Bark River">Bark River</option>
+                <option value="Ensign">Ensign</option>
 
 
             </select>
@@ -64,14 +65,15 @@
                 "esri/symbols/SimpleFillSymbol",
                 "esri/symbols/SimpleLineSymbol",
                 "esri/symbols/SimpleMarkerSymbol",
-                "esri/layers/support/FeatureFilter"
-            ], function(esriConfig, Map, MapView, FeatureLayer, SimpleRenderer, SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol, FeatureFilter) {
+                "esri/widgets/Legend",
+                "esri/widgets/LayerList"
+            ], function(esriConfig, Map, MapView, FeatureLayer, SimpleRenderer, SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol, Legend, LayerList) {
                 // set portal
                 esriConfig.portalUrl = "https://uw-mad.maps.arcgis.com";
 
                 // create a map with basemap
                 const map = new Map({
-                    basemap: "streets"
+                    basemap: "topo-vector"
                 });
 
                 // Townships layer
@@ -155,6 +157,18 @@
                 view.when(() => {
                     console.log('Map loaded with layers');
 
+                    // Add Legend widget
+                    const legend = new Legend({
+                        view: view
+                    });
+                    view.ui.add(legend, "bottom-left");
+
+                    // Add LayerList widget
+                    const layerList = new LayerList({
+                        view: view
+                    });
+                    view.ui.add(layerList, "bottom-right");
+
                     // Query distinct township labels
                     const query = townshipsLayer.createQuery();
                     query.outFields = ["NAME"];
@@ -179,7 +193,12 @@
                     // Filter function
                     function applyFilter(value) {
                         if (value) {
-                            // Query township geometry
+                            // Clear previous filters
+                            parcelsLayer.definitionExpression = "";
+                            addressPointsLayer.definitionExpression = "";
+                            // Set townships filter immediately
+                            townshipsLayer.definitionExpression = "NAME = '" + value.replace(/'/g, "''") + "'";
+                            // Query township geometry for spatial filters
                             const query = townshipsLayer.createQuery();
                             query.where = "NAME = '" + value.replace(/'/g, "''") + "'";
                             query.outFields = ["*"];
@@ -188,18 +207,25 @@
                             townshipsLayer.queryFeatures(query).then(function(results) {
                                 if (results.features.length > 0) {
                                     const geometry = results.features[0].geometry;
-                                    // Filter townships by attribute
-                                    townshipsLayer.definitionExpression = "NAME = '" + value.replace(/'/g, "''") + "'";
-                                    // Filter parcels and address points spatially
-                                    parcelsLayer.definitionExpression = "";
-                                    parcelsLayer.featureFilter = new FeatureFilter({
-                                        geometry: geometry,
-                                        spatialRelationship: "within"
+                                    // Filter parcels spatially
+                                    const parcelsQuery = parcelsLayer.createQuery();
+                                    parcelsQuery.geometry = geometry;
+                                    parcelsQuery.spatialRelationship = "intersects";
+                                    parcelsQuery.returnIdsOnly = true;
+                                    parcelsLayer.queryObjectIds(parcelsQuery).then(function(ids) {
+                                        parcelsLayer.definitionExpression = ids.length > 0 ? "OBJECTID IN (" + ids.join(",") + ")" : "1=0";
+                                    }).catch(function(error) {
+                                        console.error('Error querying parcels ids:', error);
                                     });
-                                    addressPointsLayer.definitionExpression = "";
-                                    addressPointsLayer.featureFilter = new FeatureFilter({
-                                        geometry: geometry,
-                                        spatialRelationship: "within"
+                                    // Filter address points spatially
+                                    const addressQuery = addressPointsLayer.createQuery();
+                                    addressQuery.geometry = geometry;
+                                    addressQuery.spatialRelationship = "intersects";
+                                    addressQuery.returnIdsOnly = true;
+                                    addressPointsLayer.queryObjectIds(addressQuery).then(function(ids) {
+                                        addressPointsLayer.definitionExpression = ids.length > 0 ? "OBJECTID IN (" + ids.join(",") + ")" : "1=0";
+                                    }).catch(function(error) {
+                                        console.error('Error querying address ids:', error);
                                     });
                                 }
                             }).catch(function(error) {
@@ -209,9 +235,7 @@
                             // Clear filters
                             townshipsLayer.definitionExpression = "";
                             parcelsLayer.definitionExpression = "";
-                            parcelsLayer.featureFilter = null;
                             addressPointsLayer.definitionExpression = "";
-                            addressPointsLayer.featureFilter = null;
                         }
                     }
 
@@ -232,12 +256,6 @@
             });
         </script>
     </main>
-    
-    <footer>
-        <div class="footer-content">
-            <p>&copy; 2025 Delta County GIS Application | Data from Delta County, Michigan</p>
-        </div>
-    </footer>
     
 </body>
 </html>
