@@ -18,6 +18,26 @@
             <h1>Delta County GIS Application</h1>
             <p>Interactive map of Delta County, Michigan</p>
         </div>
+        <div class="filter-container">
+            <label for="township-filter">Filter by Township:</label>
+            <select id="township-filter">
+                <option value="">All Townships</option>
+                <option value="Baldwin">Baldwin</option>
+                <option value="Bay De Noc">Bay De Noc</option>
+                <option value="Escanaba">Escanaba</option>
+                <option value="Garden">Garden</option>
+                <option value="Maple Ridge">Maple Ridge</option>
+                <option value="Masonville">Masonville</option>
+                <option value="Nahma">Nahma</option>
+                <option value="Rapid River">Rapid River</option>
+                <option value="Wells">Wells</option>
+                <option value="Gladstone">Gladstone</option>
+                <option value="Ford River">Ford River</option>
+                <option value="Bark River">Bark River</option>
+
+
+            </select>
+        </div>
     </header>
     
     <main>
@@ -43,8 +63,9 @@
                 "esri/renderers/SimpleRenderer",
                 "esri/symbols/SimpleFillSymbol",
                 "esri/symbols/SimpleLineSymbol",
-                "esri/symbols/SimpleMarkerSymbol"
-            ], function(esriConfig, Map, MapView, FeatureLayer, SimpleRenderer, SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol) {
+                "esri/symbols/SimpleMarkerSymbol",
+                "esri/layers/support/FeatureFilter"
+            ], function(esriConfig, Map, MapView, FeatureLayer, SimpleRenderer, SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol, FeatureFilter) {
                 // set portal
                 esriConfig.portalUrl = "https://uw-mad.maps.arcgis.com";
 
@@ -62,9 +83,9 @@
                     title: "Townships",
                     renderer: new SimpleRenderer({
                         symbol: new SimpleFillSymbol({
-                            color: null,
+                            color: "#FFDAB9",
                             outline: new SimpleLineSymbol({
-                                color: "lightblue",
+                                color: "#FF8C00",
                                 width: 2
                             })
                         })
@@ -117,7 +138,7 @@
                     renderer: new SimpleRenderer({
                         symbol: new SimpleMarkerSymbol({
                             style: "circle",
-                            color: "lightgreen",
+                            color: "lightblue",
                             size: 5
                         })
                     })
@@ -133,6 +154,71 @@
 
                 view.when(() => {
                     console.log('Map loaded with layers');
+
+                    // Query distinct township labels
+                    const query = townshipsLayer.createQuery();
+                    query.outFields = ["NAME"];
+                    query.returnDistinctValues = true;
+                    query.returnGeometry = false;
+
+                    townshipsLayer.queryFeatures(query).then(function(results) {
+                        const select = document.getElementById("township-filter");
+                        results.features.forEach(function(feature) {
+                            const label = feature.attributes.NAME;
+                            if (label) {
+                                const option = document.createElement("option");
+                                option.value = label;
+                                option.text = label;
+                                select.appendChild(option);
+                            }
+                        });
+                    }).catch(function(error) {
+                        console.error('Error querying townships:', error);
+                    });
+
+                    // Filter function
+                    function applyFilter(value) {
+                        if (value) {
+                            // Query township geometry
+                            const query = townshipsLayer.createQuery();
+                            query.where = "NAME = '" + value.replace(/'/g, "''") + "'";
+                            query.outFields = ["*"];
+                            query.returnGeometry = true;
+
+                            townshipsLayer.queryFeatures(query).then(function(results) {
+                                if (results.features.length > 0) {
+                                    const geometry = results.features[0].geometry;
+                                    // Filter townships by attribute
+                                    townshipsLayer.definitionExpression = "NAME = '" + value.replace(/'/g, "''") + "'";
+                                    // Filter parcels and address points spatially
+                                    parcelsLayer.definitionExpression = "";
+                                    parcelsLayer.featureFilter = new FeatureFilter({
+                                        geometry: geometry,
+                                        spatialRelationship: "intersects"
+                                    });
+                                    addressPointsLayer.definitionExpression = "";
+                                    addressPointsLayer.featureFilter = new FeatureFilter({
+                                        geometry: geometry,
+                                        spatialRelationship: "intersects"
+                                    });
+                                }
+                            }).catch(function(error) {
+                                console.error('Error querying township geometry:', error);
+                            });
+                        } else {
+                            // Clear filters
+                            townshipsLayer.definitionExpression = "";
+                            parcelsLayer.definitionExpression = "";
+                            parcelsLayer.featureFilter = null;
+                            addressPointsLayer.definitionExpression = "";
+                            addressPointsLayer.featureFilter = null;
+                        }
+                    }
+
+                    // Event listener for filter
+                    document.getElementById("township-filter").addEventListener("change", function(event) {
+                        applyFilter(event.target.value);
+                    });
                 }, function(error){
                     console.error('Map failed to load:', error);
                 });

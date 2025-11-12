@@ -1,7 +1,11 @@
 html, body, #viewDiv { height: 100%; width: 100%; margin: 0; padding: 0; }
-body { display: flex; flex-direction: column; min-height: 100vh; }
-header, footer { background: #f2f2f2; padding: 0.5rem 1rem; }
-main { flex: 1 1 auto; }
-#map-container { height: calc(100vh - 120px); }
+body { position: relative; height: 100vh; }
+header { position: absolute; top: 0; left: 0; right: 0; background: rgba(242, 242, 242, 0.9); padding: 0.25rem 1rem; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+footer { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(242, 242, 242, 0.9); padding: 0.25rem 1rem; z-index: 100; }
+.filter-container { display: flex; align-items: center; gap: 0.5rem; }
+.filter-container label { font-weight: bold; }
+.filter-container select { padding: 0.25rem; }
+main { height: 100vh; }
+#map-container { height: 100vh; }
 #viewDiv { height: 100%; }
-.field-collection-btn { position: absolute; top: 80px; right: 16px; z-index: 99; background: #fff; padding: 8px 12px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.2); text-decoration: none; color: #333; }
+.field-collection-btn { position: absolute; bottom: 60px; right: 16px; z-index: 99; background: #fff; padding: 8px 12px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.2); text-decoration: none; color: #333; }
