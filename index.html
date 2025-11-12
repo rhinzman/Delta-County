@@ -45,13 +45,8 @@
                 "esri/symbols/SimpleLineSymbol",
                 "esri/symbols/SimpleMarkerSymbol"
             ], function(esriConfig, Map, MapView, FeatureLayer, SimpleRenderer, SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol) {
-                // set api key and portal
-                esriConfig.apiKey = "AAPKd744f2fda2e347d9a3cf7faf3473cfaczN_o6-pVEC0xDG9THThI-plcBTYdOZQwfAaWLFCk-7w8cNq-B8MvENgmb2NpNTXc";
+                // set portal
                 esriConfig.portalUrl = "https://uw-mad.maps.arcgis.com";
-                esriConfig.request.interceptors.push(function(request) {
-                });
-                esriConfig.request.headers["X-Requested-With"] = "XMLHttpRequest";
-                esriConfig.request.headers["X-ArcGIS-API-Key"] = esriConfig.apiKey;
 
                 // create a map with basemap
                 const map = new Map({
@@ -122,7 +117,7 @@
                     renderer: new SimpleRenderer({
                         symbol: new SimpleMarkerSymbol({
                             style: "circle",
-                            color: "black",
+                            color: "lightgreen",
                             size: 5
                         })
                     })
