@@ -35,28 +35,106 @@
         </a>
 
         <script>
-            require(["esri/config", "esri/WebMap", "esri/views/MapView"], function(esriConfig, WebMap, MapView) {
-                // set api key
+            require([
+                "esri/config",
+                "esri/Map",
+                "esri/views/MapView",
+                "esri/layers/FeatureLayer",
+                "esri/renderers/SimpleRenderer",
+                "esri/symbols/SimpleFillSymbol",
+                "esri/symbols/SimpleLineSymbol",
+                "esri/symbols/SimpleMarkerSymbol"
+            ], function(esriConfig, Map, MapView, FeatureLayer, SimpleRenderer, SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol) {
+                // set api key and portal
                 esriConfig.apiKey = "AAPKd744f2fda2e347d9a3cf7faf3473cfaczN_o6-pVEC0xDG9THThI-plcBTYdOZQwfAaWLFCk-7w8cNq-B8MvENgmb2NpNTXc";
-                // set portal URL since it's not the default ArcGIS Online
-                esriConfig.portalUrl = "https://uw-mad.maps.arcgis.com";
 
-                // create a WebMap from the portal item id
-                const webmap = new WebMap({
-                    portalItem: {
-                        id: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/Delta_County_view/FeatureServer"
-                    }
+                // create a map with basemap
+                const map = new Map({
+                    basemap: "streets"
                 });
+
+                // Townships layer
+                const townshipsLayer = new FeatureLayer({
+                    portalItem: {
+                        id: "d915eed690bc40b280e02fe937bc2144"
+                    },
+                    layerId: 0,
+                    title: "Townships",
+                    renderer: new SimpleRenderer({
+                        symbol: new SimpleFillSymbol({
+                            color: null,
+                            outline: new SimpleLineSymbol({
+                                color: "blue",
+                                width: 2
+                            })
+                        })
+                    })
+                });
+                map.add(townshipsLayer);
+
+                // Parcels layer
+                const parcelsLayer = new FeatureLayer({
+                    portalItem: {
+                        id: "3ffcda2f2e2647889ffaec5e19ea766d"
+                    },
+                    layerId: 0,
+                    title: "Delta Parcels",
+                    renderer: new SimpleRenderer({
+                        symbol: new SimpleFillSymbol({
+                            color: null,
+                            outline: new SimpleLineSymbol({
+                                color: "lightgray",
+                                width: 1
+                            })
+                        })
+                    })
+                });
+                map.add(parcelsLayer);
+
+                // Roads layer
+                const roadsLayer = new FeatureLayer({
+                    portalItem: {
+                        id: "https://uw-mad.maps.arcgis.com/home/item.html?id=68dcda0490334cb1b1537bb5eabe6c24"
+                    },
+                    layerId: 0,
+                    title: "Roads",
+                    renderer: new SimpleRenderer({
+                        symbol: new SimpleLineSymbol({
+                            color: "black",
+                            width: 1.5
+                        })
+                    })
+                });
+                map.add(roadsLayer);
+
+                // Address Points layer
+                const addressPointsLayer = new FeatureLayer({
+                    portalItem: {
+                        id: "c6d900ca3cec407ca88a073e16883482"
+                    },
+                    layerId: 0,
+                    title: "Address Points",
+                    renderer: new SimpleRenderer({
+                        symbol: new SimpleMarkerSymbol({
+                            style: "circle",
+                            color: "black",
+                            size: 6
+                        })
+                    })
+                });
+                map.add(addressPointsLayer);
 
                 const view = new MapView({
                     container: "viewDiv",
-                    map: webmap
+                    map: map,
+                    center: [-86.8, 45.9], // approximate center of Delta County
+                    zoom: 10
                 });
 
                 view.when(() => {
-                    console.log('WebMap loaded:', webmap.portalItem.title);
+                    console.log('Map loaded with layers');
                 }, function(error){
-                    console.error('View or WebMap failed to load:', error);
+                    console.error('Map failed to load:', error);
                 });
             });
 
