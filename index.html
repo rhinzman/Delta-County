@@ -194,12 +194,12 @@
                                     parcelsLayer.definitionExpression = "";
                                     parcelsLayer.featureFilter = new FeatureFilter({
                                         geometry: geometry,
-                                        spatialRelationship: "intersects"
+                                        spatialRelationship: "within"
                                     });
                                     addressPointsLayer.definitionExpression = "";
                                     addressPointsLayer.featureFilter = new FeatureFilter({
                                         geometry: geometry,
-                                        spatialRelationship: "intersects"
+                                        spatialRelationship: "within"
                                     });
                                 }
                             }).catch(function(error) {
