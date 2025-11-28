@@ -35,6 +35,8 @@
                 <option value="Ford River">Ford River</option>
                 <option value="Bark River">Bark River</option>
                 <option value="Ensign">Ensign</option>
+                <option value="Fairbanks">Fairbanks</option>
+                <option value="Brampton">Brampton</option>
 
             </select>
         </div>
@@ -61,12 +63,13 @@
                 "esri/views/MapView",
                 "esri/layers/FeatureLayer",
                 "esri/renderers/SimpleRenderer",
+                "esri/renderers/UniqueValueRenderer",
                 "esri/symbols/SimpleFillSymbol",
                 "esri/symbols/SimpleLineSymbol",
                 "esri/symbols/SimpleMarkerSymbol",
                 "esri/widgets/Legend",
                 "esri/widgets/LayerList"
-            ], function(esriConfig, Map, MapView, FeatureLayer, SimpleRenderer, SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol, Legend, LayerList) {
+            ], function(esriConfig, Map, MapView, FeatureLayer, SimpleRenderer, UniqueValueRenderer, SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol, Legend, LayerList) {
                 // set portal
                 esriConfig.portalUrl = "https://uw-mad.maps.arcgis.com";
 
@@ -136,11 +139,30 @@
                     },
                     layerId: 0,
                     title: "Address Points",
-                    renderer: new SimpleRenderer({
-                        symbol: new SimpleMarkerSymbol({
+                    renderer: new UniqueValueRenderer({
+                        field: "Verified",
+                        uniqueValueInfos: [
+                            {
+                                value: "Yes",
+                                symbol: new SimpleMarkerSymbol({
+                                    style: "circle",
+                                    color: "green",
+                                    size: 6
+                                })
+                            },
+                            {
+                                value: "No",
+                                symbol: new SimpleMarkerSymbol({
+                                    style: "circle",
+                                    color: "red",
+                                    size: 6
+                                })
+                            }
+                        ],
+                        defaultSymbol: new SimpleMarkerSymbol({
                             style: "circle",
-                            color: "lightblue",
-                            size: 3
+                            color: "white",
+                            size: 4
                         })
                     })
                 });
