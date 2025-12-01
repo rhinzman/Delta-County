@@ -49,7 +49,7 @@
         </div>
         
         <!-- Field Collection Button -->
-        <a href="https://fieldmaps.arcgis.app/?itemID=4276a0e0d3c945bb821df31742b254de&referenceContext=open&portalURL=https%3A%2F%2Fuw-mad.maps.arcgis.com" 
+        <a href="01a8a65ea2644eb2bb91a8ea21660c2e" 
            target="_blank"
            class="field-collection-btn" 
            title="Open Field Collection App">
@@ -85,6 +85,9 @@
                     },
                     layerId: 7,
                     title: "Townships",
+                    // disable popups for the Townships layer
+                    popupEnabled: false,
+                    popupTemplate: null,
                     renderer: new SimpleRenderer({
                         symbol: new SimpleFillSymbol({
                             color: "#FFDAB9",
@@ -104,6 +107,21 @@
                     },
                     layerId: 2,
                     title: "Delta Parcels",
+                    // ensure popup attributes are returned and set a simple popup template
+                    outFields: ["Parcel_Number","Owner_s_Name","Property_Address","City_State"],
+                    popupEnabled: true,
+                    popupTemplate: {
+                        title: "Parcel {Parcel_Number}",
+                        content: [{
+                            type: "fields",
+                            fieldInfos: [
+                                { fieldName: "Parcel_Number", label: "Parcel Number" },
+                                { fieldName: "Owner_s_Name", label: "Owner's Name" },
+                                { fieldName: "Property_Address", label: "Property Address" },
+                                { fieldName: "City_State", label: "City / State" }
+                            ]
+                        }]
+                    },
                     renderer: new SimpleRenderer({
                         symbol: new SimpleFillSymbol({
                             color: null,
@@ -139,6 +157,22 @@
                     },
                     layerId: 0,
                     title: "Address Points",
+                    outFields: ["Date_Updated","Legacy_Street_Name","Legacy_Street_Name_Type","Full_Street_Name","Full_Street_Number","Full_Address","Verified"],
+                    popupEnabled: true,
+                    popupTemplate: {
+                        title: "Address: {Full_Address}",
+                        content: [{
+                            type: "fields",
+                            fieldInfos: [
+                                { fieldName: "Date_Updated", label: "Date Updated", format: { dateFormat: "shortDateShortTime" } },
+                                { fieldName: "Legacy_Street_Name", label: "Legacy Street Name" },
+                                { fieldName: "Legacy_Street_Name_Type", label: "Legacy Street Name Type" },
+                                { fieldName: "Full_Street_Name", label: "Full Street Name" },
+                                { fieldName: "Full_Street_Number", label: "Full Street Number" },
+                                { fieldName: "Full_Address", label: "Full Address" }
+                            ]
+                        }]
+                    },
                     renderer: new UniqueValueRenderer({
                         field: "Verified",
                         uniqueValueInfos: [
