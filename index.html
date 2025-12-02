@@ -298,6 +298,18 @@
                     document.getElementById("township-filter").addEventListener("change", function(event) {
                         applyFilter(event.target.value);
                     });
+
+                    // Close any open popup when user interacts with the map (pan/zoom/scroll)
+                    // this prevents a stale popup staying open after the view has moved.
+                    view.watch('interacting', function(isInteracting){
+                        if (isInteracting && view.popup && view.popup.visible) {
+                            view.popup.close();
+                        }
+                    });
+
+                    // Extra guards: close on these user events too
+                    view.on('mouse-wheel', function() { if (view.popup && view.popup.visible) view.popup.close(); });
+                    view.on('drag', function() { if (view.popup && view.popup.visible) view.popup.close(); });
                 }, function(error){
                     console.error('Map failed to load:', error);
                 });
